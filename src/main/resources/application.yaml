@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: vil.tr
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:h2:mem:studentdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DATABASE_USERNAME:sa}
+    password: ${DATABASE_PASSWORD:mari1234}
+    driver-class-name: ${DATABASE_DRIVER:org.h2.Driver}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  port: ${SERVER_PORT:8091}
