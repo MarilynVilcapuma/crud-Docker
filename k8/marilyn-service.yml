@@ -1,0 +1,20 @@
+# ─────────────────────────────────────────────────────────────
+# SERVICE (NodePort)
+# Punto de entrada estable que balancea tráfico entre los 3 pods
+# del Deployment. Puerto 80 -> targetPort 8093 -> nodePort 30093.
+# ─────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: marilyn-service
+  namespace: marilyn         # REEMPLAZABLE: debe coincidir con el "name" de marilyn-namespace.yml
+spec:
+  type: NodePort
+  selector:
+    app: vil-tr-app          # REEMPLAZABLE: debe ser IDÉNTICO al label "app" del Deployment
+                               # (así es como el Service encuentra a los pods a los que enviar tráfico)
+  ports:
+    - port: 80                # puerto del Service dentro del clúster — pedido fijo por la rúbrica
+      targetPort: 8093         # REEMPLAZABLE: debe coincidir con el containerPort del Deployment
+      nodePort: 30093           # REEMPLAZABLE: puerto público único en el clúster (rango 30000-32767).
+                                  # Si otro proyecto ya usa 30093, elige otro número libre.

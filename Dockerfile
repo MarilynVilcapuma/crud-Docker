@@ -18,7 +18,7 @@ RUN mvn clean package -DskipTests -q
 FROM eclipse-temurin:17-jdk-alpine AS jre-builder
 
 RUN jlink \
-    --add-modules java.base,java.desktop,java.sql,java.naming,java.logging,java.management,java.net.http,java.xml,jdk.crypto.ec,jdk.unsupported \
+    --add-modules java.base,java.desktop,java.instrument,java.sql,java.naming,java.logging,java.management,java.xml,java.security.jgss,jdk.crypto.ec,jdk.unsupported \
     --no-header-files \
     --no-man-pages \
     --compress=2 \
@@ -31,6 +31,8 @@ RUN du -sh /jre-minimal
 RUN mkdir -p /staging/lib && \
     cp /lib/ld-musl-*.so.1 /staging/lib/
 
+RUN mkdir -p /staging/tmp && chmod 1777 /staging/tmp
+
 # ─────────────────────────────────────────────────────────────
 # ETAPA 3: SCRATCH
 # ─────────────────────────────────────────────────────────────
@@ -38,6 +40,7 @@ FROM scratch
 
 COPY --from=jre-builder /jre-minimal /opt/java
 COPY --from=jre-builder /staging/lib /lib
+COPY --chown=1000:1000 --from=jre-builder /staging/tmp /tmp
 
 COPY --from=builder /build/target/*.jar /app.jar
 

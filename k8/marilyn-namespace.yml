@@ -1,0 +1,10 @@
+# ─────────────────────────────────────────────────────────────
+# NAMESPACE
+# Espacio de trabajo aislado dentro del clúster para este proyecto.
+# ─────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: marilyn   # REEMPLAZABLE: nombre del espacio de trabajo. En otro proyecto,
+                  # usa un nombre distinto (ej. "marilyn-proyecto2") para no
+                  # colisionar con los recursos de este namespace.

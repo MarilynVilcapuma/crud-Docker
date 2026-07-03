@@ -1,0 +1,46 @@
+# ─────────────────────────────────────────────────────────────
+# DEPLOYMENT
+# Despliegue del microservicio base: 3 réplicas (pods) corriendo
+# la misma imagen, levantadas en el puerto 8093.
+# ─────────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marilyn-deployment
+  namespace: marilyn        # REEMPLAZABLE: debe coincidir con el "name" de marilyn-namespace.yml
+  labels:
+    app: vil-tr-app         # REEMPLAZABLE: identificador único del proyecto (evita que el Service
+                             # de un proyecto enrute tráfico a los pods de otro si comparten namespace)
+spec:
+  replicas: 3                # cantidad de pods — pedido fijo por la rúbrica, normalmente no cambia
+  selector:
+    matchLabels:
+      app: vil-tr-app        # REEMPLAZABLE: debe ser IDÉNTICO al label de arriba y al del template de abajo
+  template:
+    metadata:
+      labels:
+        app: vil-tr-app       # REEMPLAZABLE: mismo valor que el selector (así el Service encuentra estos pods)
+    spec:
+      containers:
+        - name: vil-tr-app                                                  # REEMPLAZABLE: nombre del contenedor
+          image: marilynvilcapuma/ht-232-44-marilyn-vilcapuma:latest        # REEMPLAZABLE: imagen del NUEVO proyecto
+                                                                              # en Docker Hub (usuario/repo:tag)
+          ports:
+            - containerPort: 8093   # REEMPLAZABLE: puerto interno donde escucha el nuevo proyecto
+          env:
+            - name: SERVER_PORT
+              value: "8093"          # REEMPLAZABLE: debe coincidir con containerPort de arriba
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: marilyn-db-secret   # REEMPLAZABLE: debe coincidir con el "name" de marilyn-secret.yml
+                  key: DATABASE_USERNAME
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: marilyn-db-secret   # REEMPLAZABLE: debe coincidir con el "name" de marilyn-secret.yml
+                  key: DATABASE_PASSWORD
+            # Si el nuevo proyecto persiste en una base de datos externa (no H2 en memoria como este),
+            # agrega también su URL de conexión, por ejemplo:
+            # - name: DATABASE_URL
+            #   value: "jdbc:mysql://mysql-service:3306/nombre_db"
